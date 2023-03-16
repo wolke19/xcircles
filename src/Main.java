@@ -1,27 +1,31 @@
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        Path file = Paths.get("input/test7.IGC");
-        int[] lr = lrTurns(movementArray(file), interval(file),38);
+        Path file = Paths.get("input/test9.IGC");
+        int[] lr = lrTurns(movementArray(arrayErsteller(file)), interval(file),38);
         System.out.println("L/R: " + lr[0] + "/" + lr[1]);
     }
-
-
-    public static int coordinateCount(Path file) throws IOException {
+    public static ArrayList<String> arrayErsteller (Path file) throws IOException {
+        ArrayList<String> locationArray = new ArrayList<String>();
         Scanner fileScanner = new Scanner(file);
-        int counter = 0;
-        while (fileScanner.hasNextLine()){
+
+        for (int i = 0; fileScanner.hasNext(); i++){
             String line = fileScanner.nextLine();
             if (line.charAt(0) == 'B'){
-                counter++;
+               locationArray.add(line);
             }
         }
+
+
         fileScanner.close();
-        return counter;
+        return locationArray;
+
     }
     public static int interval(Path file) throws IOException {
         Scanner igcScanner = new Scanner(file);
@@ -37,19 +41,15 @@ public class Main {
         igcScanner.close();
         return intervalArray[1] - intervalArray[0];
     }
-    public static int[][] movementArray(Path file) throws IOException {
-        Scanner igcScanner = new Scanner(file);
-        int vectorArray[][] = new int[coordinateCount(file)][2];
-        String line = igcScanner.nextLine();
-        String oldLine = "";
+    public static int[][] movementArray(ArrayList<String> locationArray) throws IOException {
 
-        while (line.charAt(0) != 'B') {
-            oldLine = line;
-            line = igcScanner.nextLine();
-        }
-        oldLine = line;
+        int vectorArray[][] = new int[locationArray.size()][2];
 
-        for (int i = 0; i < vectorArray.length -1; i++) {
+
+        for (int i = 0; i < vectorArray.length - 1; i++) {
+
+            String oldLine = locationArray.get(i);
+            String line = locationArray.get(i+1);
 
             vectorArray[i][0] = Integer.parseInt(line.substring(7, 14)) - Integer.parseInt(oldLine.substring(7, 14));
             vectorArray[i][1] = Integer.parseInt(line.substring(15, 23)) - Integer.parseInt(oldLine.substring(15, 23));
@@ -63,18 +63,7 @@ public class Main {
             if (westEast == 'W'){
                 vectorArray[i][1] = -vectorArray[i][1];
             }
-
-
-            oldLine = line;
-            line = igcScanner.nextLine();
-
-            while (line.charAt(0) != 'B') {
-                line = igcScanner.nextLine();
-            }
         }
-
-
-        igcScanner.close();
         return vectorArray;
     }
     public static int[] lrTurns(int[][] v, int interval, int turnDuration){
