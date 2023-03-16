@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        Path file = Paths.get("input/test3.IGC");
+        Path file = Paths.get("input/test7.IGC");
         int[] lr = lrTurns(movementArray(file), interval(file),38);
         System.out.println("L/R: " + lr[0] + "/" + lr[1]);
     }
@@ -49,7 +49,8 @@ public class Main {
         }
         oldLine = line;
 
-        for (int i = 0; i < vectorArray.length; i++) {
+        for (int i = 0; i < vectorArray.length -1; i++) {
+
             vectorArray[i][0] = Integer.parseInt(line.substring(7, 14)) - Integer.parseInt(oldLine.substring(7, 14));
             vectorArray[i][1] = Integer.parseInt(line.substring(15, 23)) - Integer.parseInt(oldLine.substring(15, 23));
 
@@ -66,6 +67,10 @@ public class Main {
 
             oldLine = line;
             line = igcScanner.nextLine();
+
+            while (line.charAt(0) != 'B') {
+                line = igcScanner.nextLine();
+            }
         }
 
 
