@@ -1,16 +1,141 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xcircles.com</title>
+    <meta name="description" content="calculate the number of left/right rurns in you paraglider flight.">
+    <style>
+        img {
+            width: 700px;
+            border-radius: 50px;
+            float: left;
+            margin-right: 30px;
+            object-fit: cover;
+        }
+    </style>
+</head>
 
 <body>
+    <img src="images/p001.JPG">
+    <p>insert url here:</p>
 
-  <p>Before the script...</p>
+    <script>
 
-  <script>
-    alert( 'Hello, woroooold!' );
-  </script>
+        main;
 
-  <p>...After the script.</p>
+        function main() {
+            const file = path.join('input', 'test9.IGC');
+            const lr = lrTurns(movementArray(arrayErsteller(file)), interval(file), 38);
+            console.log(`L/R: ${lr[0]}/${lr[1]}`);
+            alert( `L/R: ${lr[0]}/${lr[1]}` );
+        }
 
+        function arrayErsteller(file) { 
+            const locationArray = [];
+            const fileData = fs.readFileSync(file, { encoding: 'utf8' });
+
+            const lines = fileData.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (line.charAt(0) === 'B') {
+                locationArray.push(line);
+                }
+            }
+
+            return locationArray;
+        }
+
+        function interval(file) {
+  const fileData = fs.readFileSync(file, { encoding: 'utf8' });
+  const lines = fileData.split('\n');
+
+  const intervalArray = new Array(2);
+  let counter = 0;
+
+  for (let i = 0; i < 200; i++) {
+    const line = lines[i];
+    if (i >= 198) {
+      intervalArray[counter] = parseInt(line.substring(5, 7));
+      counter++;
+    }
+  }
+
+  return intervalArray[1] - intervalArray[0];
+}
+
+        function movementArray(locationArray) {
+  const vectorArray = new Array(locationArray.length - 1);
+
+  for (let i = 0; i < vectorArray.length; i++) {
+    const oldLine = locationArray[i];
+    const line = locationArray[i + 1];
+
+    vectorArray[i] = new Array(2);
+    vectorArray[i][0] = parseInt(line.substring(7, 14)) - parseInt(oldLine.substring(7, 14));
+    vectorArray[i][1] = parseInt(line.substring(15, 23)) - parseInt(oldLine.substring(15, 23));
+
+    // Drehrichtung unter Beachtung der N/S E/W Koordinatenangaben berichtigen
+    const northSouth = line.charAt(14);
+    const westEast = line.charAt(23);
+    if (northSouth === 'S') {
+      vectorArray[i][0] = -vectorArray[i][0];
+    }
+    if (westEast === 'W') {
+      vectorArray[i][1] = -vectorArray[i][1];
+    }
+  }
+
+  return vectorArray;
+}
+
+        function lrTurns(v, interval, turnDuration) {
+  const leftRightTurns = new Array(2);
+  leftRightTurns.fill(0);
+
+  let timeCounter = 0;
+  let angleCounter = 0;
+
+  for (let i = 1; i < v.length; i++) {
+    angleCounter += richtungsAenderung(v[i - 1][0], v[i - 1][1], v[i][0], v[i][1]);
+    timeCounter++;
+
+    if (timeCounter > turnDuration / interval && angleCounter < 360 && angleCounter > -360) {
+      angleCounter = 0;
+      timeCounter = 0;
+    } else if (angleCounter >= 360) {
+      leftRightTurns[1]++;
+      angleCounter -= 360;
+      timeCounter = 0;
+    } else if (angleCounter <= -360) {
+      leftRightTurns[0]++;
+      angleCounter += 360;
+      timeCounter = 0;
+    }
+  }
+
+  return leftRightTurns;
+}
+
+        function richtungsAenderung(n1, e1, n2, e2) {
+  let kreuzprodukt = n1 * e2 - e1 * n2;
+  if (kreuzprodukt === 0) {
+      return 0;
+  }
+  let skalarprodukt = n1 * n2 + e1 * e2;
+  let betragV1 = Math.sqrt(n1 * n1 + e1 * e1);
+  let betragV2 = Math.sqrt(n2 * n2 + e2 * e2);
+
+  let richtunsAenderung = Math.toDegrees(Math.acos((skalarprodukt / (betragV1 * betragV2))));
+  if (kreuzprodukt < 0) {
+      richtunsAenderung *= -1;
+  }
+  return richtunsAenderung;
+}
+
+      </script>
 </body>
 
 </html>
