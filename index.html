@@ -9,16 +9,27 @@
 
 <h1>Flugauswertung:</h1>
 
-<div>
-    <input 
-           type="file" 
-           id="file-selector" 
-           multiple
-           accept = ".igc">
-</div>
+<form method="post" enctype="multipart/form-data">
+  <div>
+    <label for="image_uploads">Flug auswählen (.igc)</label>
+    <input
+      type="file"
+      id="image_uploads"
+      name="image_uploads"
+      accept=".igc"
+      multiple />
+  </div>
+  <div class="preview">
+    <p>No files currently selected for upload</p>
+  </div>
+  <div>
+    <button>Submit</button>
+  </div>
+</form>
 
 
 
 </body>
 
 </html>
+
